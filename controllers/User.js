@@ -18,6 +18,13 @@ function saveUserToDB(req, res) {
     });
 }
 
+/* GET users listing. */
+function getUsersFromDB(req, res, next) {
+  userModel.find().then((usersList) => {
+    res.send(usersList);
+  });
+}
+
 function saveBookToDB(req, res) {
   const { user, ISBN } = req.body;
   bookModel
@@ -47,6 +54,7 @@ function getUserBooks(req, res) {
 
 const userController = {
   saveUserToDB,
+  getUsersFromDB,
   saveBookToDB,
   getUserBooks,
 };

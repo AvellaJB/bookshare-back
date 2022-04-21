@@ -10,6 +10,8 @@ router.get("/", function (req, res, next) {
 
 router.post("/register", userController.saveUserToDB);
 
+router.get("/register", userController.getUsersFromDB);
+
 router.post("/add-book", userController.saveBookToDB);
 
 router.get("/bibliotheque", userController.getUserBooks);
