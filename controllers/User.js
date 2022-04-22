@@ -1,3 +1,5 @@
+const bcrypt = require("bcrypt");
+
 const bookModel = require("../models/bookModel");
 const userModel = require("../models/userModel");
 
@@ -52,11 +54,33 @@ function getUserBooks(req, res) {
     });
 }
 
+async function loginUser(req, res) {
+  const { pseudo, mail, password } = req.body;
+
+  if (!mail || !password || !pseudo) return res.sendStatus(400);
+
+  const user = await userModel.findOne({ mail });
+
+  if (user === null) {
+    res.status(400);
+    return res.send("Vous n'etes pas inscrit.");
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  if (isMatch) res.send("Vous êtes connecté");
+  else {
+    res.sendStatus(400);
+    res.send("Mot de passe incorrect.");
+  }
+}
+
 const userController = {
   saveUserToDB,
   getUsersFromDB,
   saveBookToDB,
   getUserBooks,
+  loginUser,
 };
 
 module.exports = userController;

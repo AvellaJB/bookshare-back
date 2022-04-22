@@ -16,4 +16,6 @@ router.post("/add-book", userController.saveBookToDB);
 
 router.get("/bibliotheque", userController.getUserBooks);
 
+router.post("/login", userController.loginUser);
+
 module.exports = router;
