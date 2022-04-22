@@ -1,5 +1,3 @@
-const bcrypt = require("bcrypt");
-
 const bookModel = require("../models/bookModel");
 const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
@@ -88,7 +86,7 @@ async function loginUser(req, res) {
 
   if (isMatch) res.send("Vous êtes connecté");
   else {
-    res.sendStatus(400);
+    res.status(400);
     res.send("Mot de passe incorrect.");
   }
 }
