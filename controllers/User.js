@@ -2,22 +2,40 @@ const bcrypt = require("bcrypt");
 
 const bookModel = require("../models/bookModel");
 const userModel = require("../models/userModel");
+const bcrypt = require("bcrypt");
 
-function saveUserToDB(req, res) {
-  const { pseudo, mail, password } = req.body;
-  userModel
-    .create({
-      pseudo,
-      mail,
-      password,
-    })
-    .then(() => {
-      console.log("Succesfully sent to DB");
-      res.send("Client bien reçu en DB");
-    })
-    .catch(() => {
-      res.sendStatus(500);
-    });
+const salts = 10;
+
+async function saveUserToDB(req, res) {
+  const { pseudo, mail, password, confirmPassword } = req.body;
+  // a-t-on toutes les variables nécessaires ?
+  if (!pseudo) return res.sendStatus(400);
+  if (!mail) return res.sendStatus(400);
+  if (!password) return res.sendStatus(400);
+  if (!confirmPassword) return res.sendStatus(400);
+  // password = confirmPassword ?
+  if (password !== confirmPassword) return res.sendStatus(400);
+
+  const hashedPassword = await bcrypt.hash(password, salts);
+
+  // vérifier que l'utilisateur n'existe pas
+  const result = await userModel.find({ mail });
+  const creationPossible = result.length === 0;
+  if (creationPossible) {
+    try {
+      await userModel.create({
+        pseudo,
+        mail,
+        password: hashedPassword,
+      });
+    } catch (err) {
+      return res.sendStatus(500);
+    }
+    res.sendStatus(201);
+  } else {
+    res.status(400);
+    res.send("Utilisateur déjà existant");
+  }
 }
 
 /* GET users listing. */
