@@ -1,6 +1,7 @@
 const bookModel = require("../models/bookModel");
 const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const salts = 10;
 
@@ -44,10 +45,11 @@ function getUsersFromDB(req, res, next) {
 }
 
 function saveBookToDB(req, res) {
-  const { user, ISBN } = req.body;
+  const { ISBN } = req.body;
+  const user = req.user;
   bookModel
     .create({
-      user,
+      user: user.id,
       ISBN,
     })
     .then(() => {
@@ -60,8 +62,10 @@ function saveBookToDB(req, res) {
 }
 
 function getUserBooks(req, res) {
+  const user = req.user;
+
   bookModel
-    .find()
+    .find({ user: user.id })
     .then((result) => {
       res.send(result);
     })
@@ -83,8 +87,9 @@ async function loginUser(req, res) {
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
+  const token = jwt.sign({ id: user._id }, process.env.SECRET);
 
-  if (isMatch) res.send("Vous êtes connecté");
+  if (isMatch) res.send({ jwt: token });
   else {
     res.status(400);
     res.send("Mot de passe incorrect.");
