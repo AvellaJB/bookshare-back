@@ -14,6 +14,8 @@ router.get("/register", userController.getUsersFromDB);
 
 router.post("/add-book", checkAuth, userController.saveBookToDB);
 
+router.delete("/:id", checkAuth, userController.deleteBookToDB);
+
 router.get("/bibliotheque", checkAuth, userController.getUserBooks);
 
 router.post("/login", userController.loginUser);

@@ -61,6 +61,18 @@ function saveBookToDB(req, res) {
     });
 }
 
+function deleteBookToDB(req, res) {
+  bookModel
+    .findByIdAndDelete(req.params.id)
+    .then(() => {
+      console.log("Succesfully delete to DB");
+      res.send("Client bien supprimé en DB");
+    })
+    .catch(() => {
+      res.sendStatus(500);
+    });
+}
+
 function getUserBooks(req, res) {
   const user = req.user;
 
@@ -102,6 +114,7 @@ const userController = {
   saveBookToDB,
   getUserBooks,
   loginUser,
+  deleteBookToDB,
 };
 
 module.exports = userController;

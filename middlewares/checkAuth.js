@@ -5,6 +5,7 @@ const getToken = (req) => String(req.get("Authorization")).split(" ")[1];
 
 function checkAuth(req, res, next) {
   const token = getToken(req);
+  console.log(token);
   if (!token) return res.sendStatus(401);
 
   try {
