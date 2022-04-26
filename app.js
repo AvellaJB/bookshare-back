@@ -9,7 +9,7 @@ var cors = require("cors");
 const mongoose = require("mongoose");
 
 mongoose
-  .connect("mongodb://localhost:27017/projet-ring")
+  .connect(process.env.MONGO_URL)
   .then(() => console.log("connected"))
   .catch(() => console.log("problem db"));
 
