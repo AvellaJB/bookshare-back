@@ -62,6 +62,8 @@ function saveBookToDB(req, res) {
 }
 
 function deleteBookToDB(req, res) {
+  console.log(req.params.id);
+
   bookModel
     .findByIdAndDelete(req.params.id)
     .then(() => {
