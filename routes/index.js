@@ -9,7 +9,7 @@ router.get("/", function (req, res, next) {
 
 router.post("/register", userController.saveUserToDB);
 
-router.get("/register", userController.getUsersFromDB);
+router.get("/users", checkAuth, userController.getUsersFromDB);
 
 router.post("/add-book", checkAuth, userController.saveBookToDB);
 

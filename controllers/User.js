@@ -39,9 +39,12 @@ async function saveUserToDB(req, res) {
 
 /* GET users listing. */
 function getUsersFromDB(req, res, next) {
-  userModel.find().then((usersList) => {
-    res.send(usersList);
-  });
+  userModel
+    .find()
+    .select("-password")
+    .then((usersList) => {
+      res.send(usersList);
+    });
 }
 
 function saveBookToDB(req, res) {
@@ -89,9 +92,9 @@ function getUserBooks(req, res) {
 }
 
 async function loginUser(req, res) {
-  const { pseudo, mail, password } = req.body;
+  const { mail, password } = req.body;
 
-  if (!mail || !password || !pseudo) return res.sendStatus(400);
+  if (!mail || !password) return res.sendStatus(400);
 
   const user = await userModel.findOne({ mail });
 
