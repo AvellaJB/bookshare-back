@@ -1,4 +1,5 @@
 var express = require("express");
+const friendsController = require("../controllers/Friends");
 const userController = require("../controllers/User");
 var router = express.Router();
 const { checkAuth } = require("../middlewares/checkAuth");
@@ -18,5 +19,11 @@ router.delete("/:id", checkAuth, userController.deleteBookToDB);
 router.get("/bibliotheque", checkAuth, userController.getUserBooks);
 
 router.post("/login", userController.loginUser);
+
+router.post("/add-friend", friendsController.friendRequest);
+
+router.post("/accept-friend-request", friendsController.AcceptFriendRequest);
+
+router.post("/reject-friend-request", friendsController.RejectFriendRequest);
 
 module.exports = router;
