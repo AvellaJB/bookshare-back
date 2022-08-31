@@ -10,7 +10,7 @@ router.get("/", function (req, res, next) {
 
 router.post("/register", userController.saveUserToDB);
 
-router.get("/users", checkAuth, userController.getUsersFromDB);
+router.get("/users", userController.getUsersFromDB);
 
 router.post("/add-book", checkAuth, userController.saveBookToDB);
 
@@ -25,5 +25,9 @@ router.post("/add-friend", friendsController.friendRequest);
 router.post("/accept-friend-request", friendsController.AcceptFriendRequest);
 
 router.post("/reject-friend-request", friendsController.RejectFriendRequest);
+
+router.post("/friend-list", userController.getMyFriendsList);
+
+router.get("/user-query", userController.getUsersByName);
 
 module.exports = router;

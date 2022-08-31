@@ -1,6 +1,5 @@
 const bookModel = require("../models/bookModel");
 const userModel = require("../models/userModel");
-
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -42,7 +41,7 @@ async function saveUserToDB(req, res) {
 function getUsersFromDB(req, res, next) {
   userModel
     .find()
-    .select("-password")
+    .select("-password -friends -friendRequests -__v")
     .then((usersList) => {
       res.send(usersList);
     });
@@ -98,6 +97,9 @@ async function loginUser(req, res) {
   if (!mail || !password) return res.sendStatus(400);
 
   const user = await userModel.findOne({ mail });
+  const passwordLessUser = await userModel
+    .findOne({ mail })
+    .select("-password");
 
   if (user === null) {
     res.status(400);
@@ -107,11 +109,32 @@ async function loginUser(req, res) {
   const isMatch = await bcrypt.compare(password, user.password);
   const token = jwt.sign({ id: user._id }, process.env.SECRET);
 
-  if (isMatch) res.send({ jwt: token });
+  if (isMatch) res.send({ jwt: token, userInfo: passwordLessUser });
   else {
     res.status(400);
     res.send("Mot de passe incorrect.");
   }
+}
+
+async function getMyFriendsList(req, res) {
+  const { currentUser } = req.body;
+
+  const user = await userModel
+    .findById({ _id: currentUser })
+    .populate({ path: "friends", select: "pseudo _id mail" });
+
+  console.log(user.friends);
+  res.send(user.friends);
+}
+
+//prettier-ignore
+
+async function getUsersByName(req, res) {
+  const { pseudo } = req.body;
+
+  const results =  await userModel.find({pseudo: {$regex: '.*' + pseudo +'.*'  }}).select("pseudo mail");
+
+  res.send(results);
 }
 
 const userController = {
@@ -121,6 +144,8 @@ const userController = {
   getUserBooks,
   loginUser,
   deleteBookToDB,
+  getMyFriendsList,
+  getUsersByName,
 };
 
 module.exports = userController;

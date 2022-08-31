@@ -24,11 +24,11 @@ async function friendRequest(req, res) {
 
   const updateRequester = await userModel.findOneAndUpdate(
     { _id: requester },
-    { $push: { friends: docRequester._id } }
+    { $push: { friendRequests: docRequester._id } }
   );
   const updateRecipient = await userModel.findOneAndUpdate(
     { _id: recipient },
-    { $push: { friends: docRecipient._id } }
+    { $push: { friendRequests: docRecipient._id } }
   );
 
   res.send("Request sent");
@@ -37,8 +37,52 @@ async function friendRequest(req, res) {
 async function AcceptFriendRequest(req, res) {
   const { requester, recipient } = req.body;
 
-  //Quand le recipient accept la demander, on update sa liste d'amis
-  const updateRecipientsFriends = await friendModel.findOneAndUpdate(
+  //On récupère les friendRequest du point de vue du requester et du recipient
+  const RequesterFriendRequest = await friendModel.findOne({
+    requester: requester,
+    recipient: recipient,
+  });
+  const RecipientFriendRequest = await friendModel.findOne({
+    requester: recipient,
+    recipient: requester,
+  });
+
+  //On delete dans le user, les friendsRequest :
+  const updateUserRecipientFriendRequest = await userModel.findOneAndUpdate(
+    { _id: recipient },
+    {
+      $pull: {
+        friendRequests: mongoose.Types.ObjectId(RecipientFriendRequest),
+      },
+    }
+  );
+  const updateUserRequesterFriendRequest = await userModel.findOneAndUpdate(
+    { _id: requester },
+    {
+      $pull: {
+        friendRequests: mongoose.Types.ObjectId(RequesterFriendRequest),
+      },
+    }
+  );
+
+  //On update le friendList
+
+  const updateRecipientFriendList = await userModel.findOneAndUpdate(
+    { _id: recipient },
+    {
+      $push: { friends: mongoose.Types.ObjectId(requester) },
+    }
+  );
+
+  const updateRequesterFriendList = await userModel.findOneAndUpdate(
+    { _id: requester },
+    {
+      $push: { friends: mongoose.Types.ObjectId(recipient) },
+    }
+  );
+
+  //On delete la friendRequest
+  const deleteRecipientsFriendRequest = await friendModel.findOneAndDelete(
     { requester: requester, recipient: recipient },
     {
       $set: { status: 3 },
@@ -46,7 +90,7 @@ async function AcceptFriendRequest(req, res) {
   );
 
   //On update également la liste d'amis du requested.
-  const updateRequestersFriends = await friendModel.findOneAndUpdate(
+  const deleteRequestersFriendRequest = await friendModel.findOneAndDelete(
     { recipient: requester, requester: recipient },
     {
       $set: { status: 3 },
@@ -80,42 +124,10 @@ async function RejectFriendRequest(req, res) {
   res.sendStatus(200);
 }
 
-async function getFriendsList(req, res) {
-  const { currentUser } = req.body;
-
-  let user = userModel.aggregate([
-    {
-      $lookup: {
-        from: friendModel.collection.name,
-        let: { friends: "$friends" },
-        pipeline: [
-          {
-            $match: {
-              recipient: mongoose.Types.ObjectId(currentUser),
-              $expr: { $in: ["$_id", "$$friends"] },
-            },
-          },
-          { $project: { status: 1 } },
-        ],
-        as: "friends",
-      },
-    },
-    {
-      $addFields: {
-        friendsStatus: {
-          $ifNull: [{ $min: "$friends.status" }, 0],
-        },
-      },
-    },
-  ]);
-  res.send(user);
-}
-
 const friendsController = {
   friendRequest,
   AcceptFriendRequest,
   RejectFriendRequest,
-  getFriendsList,
 };
 
 module.exports = friendsController;
