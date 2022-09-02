@@ -2,6 +2,7 @@ const bookModel = require("../models/bookModel");
 const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const friendModel = require("../models/friendModel");
 
 const salts = 10;
 
@@ -123,17 +124,28 @@ async function getMyFriendsList(req, res) {
     .findById({ _id: currentUser })
     .populate({ path: "friends", select: "pseudo _id mail" });
 
-  console.log(user.friends);
   res.send(user.friends);
+}
+
+async function getMyFriendRequests(req, res) {
+  const { currentUser } = req.body;
+
+  /*   const user = await userModel
+    .findById({ _id: currentUser })
+    .populate({ path: "friendRequests" }); */
+
+  const Requests = await friendModel
+    .find({ requester: currentUser })
+    .populate({ path: "recipient", select: "pseudo _id mail" });
+
+  res.send(Requests);
 }
 
 //prettier-ignore
 
 async function getUsersByName(req, res) {
   const { pseudo } = req.body;
-
   const results =  await userModel.find({pseudo: {$regex: '.*' + pseudo +'.*'  }}).select("pseudo mail");
-
   res.send(results);
 }
 
@@ -146,6 +158,7 @@ const userController = {
   deleteBookToDB,
   getMyFriendsList,
   getUsersByName,
+  getMyFriendRequests,
 };
 
 module.exports = userController;

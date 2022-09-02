@@ -28,6 +28,8 @@ router.post("/reject-friend-request", friendsController.RejectFriendRequest);
 
 router.post("/friend-list", userController.getMyFriendsList);
 
-router.get("/user-query", userController.getUsersByName);
+router.post("/user-query", userController.getUsersByName);
+
+router.post("/friend-requests", userController.getMyFriendRequests);
 
 module.exports = router;

@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const friendsSchema = new mongoose.Schema({
-  requester: { type: mongoose.Types.ObjectId, ref: "Users" },
-  recipient: { type: mongoose.Types.ObjectId, ref: "Users" },
+  requester: { type: mongoose.Types.ObjectId, ref: "user" },
+  recipient: { type: mongoose.Types.ObjectId, ref: "user" },
   status: {
     type: Number,
     enums: [

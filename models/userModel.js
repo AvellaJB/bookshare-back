@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
   pseudo: String,
   mail: String,
   password: String,
-  friendRequests: [{ type: mongoose.Types.ObjectId, ref: "FriendRequests" }],
+  friendRequests: [{ type: mongoose.Types.ObjectId, ref: "friendRequests" }],
   friends: [{ type: mongoose.Types.ObjectId, ref: "user" }],
 });
 
