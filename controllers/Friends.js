@@ -47,6 +47,8 @@ async function AcceptFriendRequest(req, res) {
     recipient: requester,
   });
 
+  console.log(requester);
+
   //On delete dans le user, les friendsRequest :
   const updateUserRecipientFriendRequest = await userModel.findOneAndUpdate(
     { _id: recipient },
@@ -102,6 +104,8 @@ async function AcceptFriendRequest(req, res) {
 
 async function RejectFriendRequest(req, res) {
   const { requester, recipient } = req.body;
+
+  console.log(req.body);
 
   const docRequester = await friendModel.findOneAndRemove({
     requester: requester,
