@@ -187,6 +187,15 @@ async function CommentBook(req, res) {
     .catch((err) => res.send(err));
 }
 
+async function FindBook(req, res) {
+  const { bookId } = req.body;
+  const result = await bookModel
+    .findById({ _id: bookId })
+    .populate({ path: "user", select: "pseudo _id mail" })
+    .populate({ path: "comments.user", select: "pseudo _id mail" });
+  res.send(result);
+}
+
 const userController = {
   saveUserToDB,
   getUsersFromDB,
@@ -200,6 +209,7 @@ const userController = {
   getFriendsLibrary,
   UpdateBook,
   CommentBook,
+  FindBook,
 };
 
 module.exports = userController;

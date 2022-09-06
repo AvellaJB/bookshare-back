@@ -38,4 +38,6 @@ router.post("/update-book", userController.UpdateBook);
 
 router.post("/comment-book", userController.CommentBook);
 
+router.post("/find-book", userController.FindBook);
+
 module.exports = router;
