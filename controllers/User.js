@@ -3,6 +3,7 @@ const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const friendModel = require("../models/friendModel");
+const { default: mongoose } = require("mongoose");
 
 const salts = 10;
 
@@ -149,6 +150,43 @@ async function getUsersByName(req, res) {
   res.send(results);
 }
 
+function getFriendsLibrary(req, res) {
+  const { id } = req.body;
+  bookModel
+    .find({ user: id })
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+async function UpdateBook(req, res) {
+  const { userReview, id } = req.body;
+  const update = await bookModel
+    .findByIdAndUpdate({ _id: id }, { userReview: userReview })
+    .then((result) => res.send(result))
+    .catch((err) => {
+      res.send(err);
+    });
+}
+
+async function CommentBook(req, res) {
+  const { bookId, comment, friend } = req.body;
+  const update = await bookModel
+    .findByIdAndUpdate(
+      { _id: bookId },
+      {
+        $push: {
+          comments: { comment: comment, user: friend },
+        },
+      }
+    )
+    .then((res) => res.send(res))
+    .catch((err) => res.send(err));
+}
+
 const userController = {
   saveUserToDB,
   getUsersFromDB,
@@ -159,6 +197,9 @@ const userController = {
   getMyFriendsList,
   getUsersByName,
   getMyFriendRequests,
+  getFriendsLibrary,
+  UpdateBook,
+  CommentBook,
 };
 
 module.exports = userController;

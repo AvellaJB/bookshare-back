@@ -32,4 +32,10 @@ router.post("/user-query", userController.getUsersByName);
 
 router.post("/friend-requests", userController.getMyFriendRequests);
 
+router.post("/friends-library", userController.getFriendsLibrary);
+
+router.post("/update-book", userController.UpdateBook);
+
+router.post("/comment-book", userController.CommentBook);
+
 module.exports = router;
