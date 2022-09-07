@@ -162,7 +162,7 @@ function getFriendsLibrary(req, res) {
     });
 }
 
-async function UpdateBook(req, res) {
+async function reviewBook(req, res) {
   const { userReview, id } = req.body;
   const update = await bookModel
     .findByIdAndUpdate({ _id: id }, { userReview: userReview })
@@ -191,7 +191,7 @@ async function FindBook(req, res) {
   const { bookId } = req.body;
   const result = await bookModel
     .findById({ _id: bookId })
-    .populate({ path: "user", select: "pseudo _id mail" })
+    .populate({ path: "user", select: "pseudo _id mail friends" })
     .populate({ path: "comments.user", select: "pseudo _id mail" });
   res.send(result);
 }
@@ -212,6 +212,13 @@ async function DeleteComment(req, res) {
   res.sendStatus(200);
 }
 
+async function getUserInfoById(req, res) {
+  const { id } = req.body;
+  console.log(req.body);
+  const result = await userModel.findById(id).select("-password");
+  res.send(result);
+}
+
 const userController = {
   saveUserToDB,
   getUsersFromDB,
@@ -223,10 +230,11 @@ const userController = {
   getUsersByName,
   getMyFriendRequests,
   getFriendsLibrary,
-  UpdateBook,
+  reviewBook,
   CommentBook,
   FindBook,
   DeleteComment,
+  getUserInfoById,
 };
 
 module.exports = userController;

@@ -34,12 +34,14 @@ router.post("/friend-requests", userController.getMyFriendRequests);
 
 router.post("/friends-library", userController.getFriendsLibrary);
 
-router.post("/update-book", userController.UpdateBook);
+router.post("/review-book", userController.reviewBook);
 
 router.post("/comment-book", userController.CommentBook);
 
 router.post("/find-book", userController.FindBook);
 
 router.post("/delete-comment", userController.DeleteComment);
+
+router.post("/get-one-user", userController.getUserInfoById);
 
 module.exports = router;
