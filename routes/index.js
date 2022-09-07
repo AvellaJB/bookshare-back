@@ -40,4 +40,6 @@ router.post("/comment-book", userController.CommentBook);
 
 router.post("/find-book", userController.FindBook);
 
+router.post("/delete-comment", userController.DeleteComment);
+
 module.exports = router;

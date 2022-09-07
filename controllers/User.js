@@ -196,6 +196,22 @@ async function FindBook(req, res) {
   res.send(result);
 }
 
+async function DeleteComment(req, res) {
+  const { commentId } = req.body;
+  const result = await bookModel
+    .findOneAndUpdate(
+      { "comments._id": commentId },
+      {
+        $pull: {
+          comments: { _id: commentId },
+        },
+      }
+    )
+    .then((res) => console.log(res));
+
+  res.sendStatus(200);
+}
+
 const userController = {
   saveUserToDB,
   getUsersFromDB,
@@ -210,6 +226,7 @@ const userController = {
   UpdateBook,
   CommentBook,
   FindBook,
+  DeleteComment,
 };
 
 module.exports = userController;
