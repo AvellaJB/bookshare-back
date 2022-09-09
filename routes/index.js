@@ -1,6 +1,7 @@
 var express = require("express");
 const friendsController = require("../controllers/Friends");
 const userController = require("../controllers/User");
+const BookSharingController = require("../controllers/BookSharing");
 var router = express.Router();
 const { checkAuth } = require("../middlewares/checkAuth");
 /* GET home page. */
@@ -43,5 +44,17 @@ router.post("/find-book", userController.FindBook);
 router.post("/delete-comment", userController.DeleteComment);
 
 router.post("/get-one-user", userController.getUserInfoById);
+
+router.post("/borrow-book-request", BookSharingController.BorrowRequest);
+
+router.post(
+  "/accept-borrow-request",
+  BookSharingController.AcceptBorrowRequest
+);
+router.post(
+  "/reject-borrow-request",
+  BookSharingController.RejectBorrowRequest
+);
+router.post("/recover-book", BookSharingController.RecoverBook);
 
 module.exports = router;

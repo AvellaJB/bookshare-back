@@ -56,6 +56,7 @@ function saveBookToDB(req, res) {
     .create({
       user: user.id,
       ISBN,
+      book_status: 0,
     })
     .then(() => {
       console.log("Succesfully sent to DB");
