@@ -84,7 +84,7 @@ async function AcceptBorrowRequest(req, res) {
       _id: owner,
     },
     {
-      $push: { books_lended: book },
+      $push: { books_lended: { book: book, borrower: borrower } },
     }
   );
   const updateBorrower = await userModel.findOneAndUpdate(
