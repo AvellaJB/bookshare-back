@@ -57,4 +57,11 @@ router.post(
 );
 router.post("/recover-book", BookSharingController.RecoverBook);
 
+router.post("/book-request-list", BookSharingController.getBookRequestList);
+
+router.post(
+  "/books-lended-borrowed",
+  BookSharingController.getBooksBorrowedAndLended
+);
+
 module.exports = router;

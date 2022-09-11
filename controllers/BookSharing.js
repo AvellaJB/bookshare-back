@@ -121,6 +121,15 @@ async function AcceptBorrowRequest(req, res) {
 async function RejectBorrowRequest(req, res) {
   const { borrower, owner, book } = req.body;
 
+  const bookRequestOwner = await bookLendingModel.findOne({
+    borrower: borrower,
+    owner: owner,
+  });
+  const bookRequestBorrower = await bookLendingModel.findOne({
+    borrower: owner,
+    owner: borrower,
+  });
+
   //On delete la friendRequest
   const deleteOwnerBookRequest = await bookLendingModel.findOneAndDelete({
     owner: owner,
@@ -137,7 +146,7 @@ async function RejectBorrowRequest(req, res) {
       _id: owner,
     },
     {
-      $pull: { books_lended: book },
+      $pull: { bookRequests: bookRequestOwner._id },
     }
   );
   const updateBorrower = await userModel.findOneAndUpdate(
@@ -145,7 +154,7 @@ async function RejectBorrowRequest(req, res) {
       _id: borrower,
     },
     {
-      $pull: { books_borrowed: book },
+      $pull: { bookRequests: bookRequestBorrower._id },
     }
   );
 }
@@ -159,7 +168,7 @@ async function RecoverBook(req, res) {
       _id: owner,
     },
     {
-      $pull: { books_lended: book },
+      $pull: { books_lended: { book: book } },
     }
   );
   const updateBorrower = await userModel.findOneAndUpdate(
@@ -176,11 +185,41 @@ async function RecoverBook(req, res) {
       _id: book,
     },
     {
-      book_status: 1,
+      book_status: 0,
     }
   );
 
   res.sendStatus(200);
+}
+
+async function getBookRequestList(req, res) {
+  const { currentUser } = req.body;
+
+  const bookRequests = await bookLendingModel
+    .find({ owner: currentUser })
+    .populate({ path: "book" })
+    .populate({ path: "borrower", select: "pseudo mail _id " });
+
+  res.send(bookRequests);
+}
+
+async function getBooksBorrowedAndLended(req, res) {
+  const { currentUser } = req.body;
+
+  const user = await userModel
+    .find({ _id: currentUser })
+    .select("-password -friends -friendRequests")
+    .populate({
+      path: "books_lended",
+      populate: { path: "book" },
+    })
+    .populate({ path: "books_lended.borrower", select: "_id pseudo mail" })
+    .populate({
+      path: "books_borrowed",
+      populate: { path: "user", select: "pseudo mail _id" },
+    });
+
+  res.send(user[0]);
 }
 
 const BookSharingController = {
@@ -188,6 +227,8 @@ const BookSharingController = {
   AcceptBorrowRequest,
   RecoverBook,
   RejectBorrowRequest,
+  getBookRequestList,
+  getBooksBorrowedAndLended,
 };
 
 module.exports = BookSharingController;
